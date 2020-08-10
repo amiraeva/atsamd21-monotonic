@@ -66,7 +66,7 @@ fn main() -> ! {
     }
 
     unsafe {
-        core.NVIC.set_priority(interrupt::USB, 1);
+        core.NVIC.set_priority(interrupt::USB, 2);
         NVIC::unmask(interrupt::USB);
     }
 
@@ -85,10 +85,12 @@ fn main() -> ! {
         // while atsamd21_monotonic::Monotonic::now() < next {}
         // red_led.toggle();
 
-        if tc4tc5_fused.overflowed() {
-            tc4tc5_fused.reset_ovf_flag();
-            red_led.toggle();
-        }
+        cortex_m::asm::wfi();
+
+        // if tc4tc5_fused.overflowed() {
+        //     tc4tc5_fused.reset_ovf_flag();
+        //     red_led.toggle();
+        // }
     }
 }
 
@@ -114,9 +116,9 @@ fn poll_usb() {
                     //     serial.write(&[c.clone()]);
                     // }
 
-                    let count = atsamd21_monotonic::Monotonic::now();
+                    let count = atsamd21_monotonic::Monotonic::now().0;
                     let _ = serial.write(b"time: ");
-                    let count = count.0.numtoa(10, &mut buf);
+                    let count = count.numtoa(10u32, &mut buf);
                     let _ = serial.write(count);
                     let _ = serial.write(b"\r\n");
                 };
@@ -124,7 +126,7 @@ fn poll_usb() {
         });
     };
 }
-use feather_m0 as _;
+// use feather_m0 as _;
 
 #[interrupt]
 fn USB() {
