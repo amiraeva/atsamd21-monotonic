@@ -92,10 +92,11 @@ fn main() -> ! {
     }
 }
 
-
 static mut USB_ALLOCATOR: Option<UsbBusAllocator<UsbBus>> = None;
 static mut USB_BUS: Option<UsbDevice<UsbBus>> = None;
 static mut USB_SERIAL: Option<SerialPort<UsbBus>> = None;
+
+use numtoa::NumToA as _;
 
 fn poll_usb() {
     unsafe {
@@ -105,12 +106,19 @@ fn poll_usb() {
                 let mut buf = [0u8; 64];
 
                 if let Ok(count) = serial.read(&mut buf) {
-                    for (i, c) in buf.iter().enumerate() {
-                        if i >= count {
-                            break;
-                        }
-                        serial.write(&[c.clone()]);
-                    }
+                    // for (i, c) in buf.iter().enumerate() {
+                    //     if i >= count {
+                    //         break;
+                    //     }
+
+                    //     serial.write(&[c.clone()]);
+                    // }
+
+                    let count = atsamd21_monotonic::Monotonic::now();
+                    let _ = serial.write(b"time: ");
+                    let count = count.0.numtoa(10, &mut buf);
+                    let _ = serial.write(count);
+                    let _ = serial.write(b"\r\n");
                 };
             });
         });

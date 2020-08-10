@@ -125,8 +125,8 @@ impl rtic::Monotonic for Monotonic {
     }
 }
 
-#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
-pub struct Instant(u32);
+#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq, Debug)]
+pub struct Instant(pub u32);
 
 // impl Instant {
 //     pub fn elapsed(&self) -> Instant {

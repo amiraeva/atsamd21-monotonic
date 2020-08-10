@@ -57,6 +57,7 @@ dependencies = [
  "cortex-m-rt",
  "cortex-m-rtic",
  "feather_m0",
+ "numtoa",
  "panic-halt",
  "usb-device",
  "usbd-serial",
@@ -258,6 +259,12 @@ name = "nb"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "546c37ac5d9e56f55e73b677106873d9d9f5190605e41a856503623648488cae"
+
+[[package]]
+name = "numtoa"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e521b6adefa0b2c1fa5d2abdf9a5216288686fe6146249215d884c0e5ab320b0"
 
 [[package]]
 name = "panic-halt"
