@@ -24,7 +24,9 @@ features = ["samd21g18a"]
 cortex-m = "0.6.3"
 panic-halt = "0.2.0"
 cortex-m-rt = "0.6.12"
-feather_m0 = "0.7"
+feather_m0 = { version = "0.7", features = ["usb"]}
+usbd-serial = "0.1"
+usb-device = "0.2"
 
 [[example]]
 name = "blink_1s"

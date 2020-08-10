@@ -63,10 +63,10 @@ impl FusedTimerCounter<TC4, TC5> {
 
         while tc5.count32().status.read().syncbusy().bit_is_set() {} // don't know if this is necessary
 
-        // Can test if the 32 bit mode was actually enabled
-        // if !_tc5.count32().status.read().slave().bit_is_set() {
-        //     panic!("32 bit mode didn't work for fused counter");
-        // }
+        // Tests if the 32 bit mode was actually enabled
+        if !tc5.count32().status.read().slave().bit_is_set() {
+            panic!("32 bit mode didn't work for fused counter");
+        }
 
         let counter = Self { t1: tc4, _t2: tc5 };
 
