@@ -19,8 +19,8 @@ impl FusedTimerCounter<TC4, TC5> {
         gclk: &mut GenericClockController,
         pm: &mut PM,
     ) -> &'static Self {
-        let gclk1 = gclk.gclk1();
-        let tc45 = gclk.tc4_tc5(&gclk1).expect("tc4_tc5 already initialized");
+        let gclk0 = gclk.gclk0();
+        let _tc45 = gclk.tc4_tc5(&gclk0).expect("tc4_tc5 already initialized");
 
         pm.apbcmask.modify(|_, w| w.tc4_().set_bit());
         pm.apbcmask.modify(|_, w| w.tc5_().set_bit()); // don't know if this is necessary
@@ -47,13 +47,15 @@ impl FusedTimerCounter<TC4, TC5> {
         });
 
         // Set TOP value for mfrq mode
-        count.cc[0].write(|w| unsafe { w.cc().bits(0xFFFF_FFFF as u32) }); // continue counting and wrapping around u32::MAX
+        count.cc[0].write(|w| unsafe { w.cc().bits(u32::max_value()) }); // continue counting and wrapping around u32::MAX
 
         count.ctrla.modify(|_, w| {
             w.mode().count32();
-            w.wavegen().nfrq(); // I spent too many hours to count figuring this out DO NOT USE mfrq
-            w.prescaler().div1(); // divides CPU clock speed
+            // moral of the story, don't use either, just let it be whatever the default is?
+            // w.wavegen().mfrq(); // I spent too many hours to count figuring this out DO NOT USE mfrq
+            w.prescaler().div1024(); // divides CPU clock speed
             w.prescsync().presc();
+            w.runstdby().set_bit();
             w.enable().set_bit()
         });
 
@@ -156,7 +158,7 @@ impl Add<atsamd_hal::time::Miliseconds> for Instant {
     type Output = Instant;
 
     fn add(self, other: atsamd_hal::time::Miliseconds) -> Self::Output {
-        const MILLIS_TO_CLK: u32 = (48_000_000 / 1024) / 1000;
+        const MILLIS_TO_CLK: u32 = 48_000_000 / 1024 / 1000;
         let counter_cycles = other.0 * MILLIS_TO_CLK;
         Self(self.0 + counter_cycles)
     }

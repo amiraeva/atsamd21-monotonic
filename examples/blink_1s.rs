@@ -30,7 +30,7 @@ use cortex_m::peripheral::NVIC;
 fn main() -> ! {
     let mut core = CorePeripherals::take().unwrap();
     let mut peripherals = Peripherals::take().unwrap();
-    let mut clocks = GenericClockController::with_internal_32kosc(
+    let mut clocks = GenericClockController::with_external_32kosc(
         peripherals.GCLK,
         &mut peripherals.PM,
         &mut peripherals.SYSCTRL,
@@ -80,10 +80,10 @@ fn main() -> ! {
 
     loop {
         // let start = atsamd21_monotonic::Monotonic::now();
-        // let next = start + 1000.ms();
+        // let next = start + 500.ms();
 
         // while atsamd21_monotonic::Monotonic::now() < next {}
-        // red_led.toggle();
+        red_led.toggle();
 
         cortex_m::asm::wfi();
 
@@ -120,13 +120,12 @@ fn poll_usb() {
                     let _ = serial.write(b"time: ");
                     let count = count.numtoa(10u32, &mut buf);
                     let _ = serial.write(count);
-                    let _ = serial.write(b"\r\n");
+                    let _ = serial.write(b";\r\n");
                 };
             });
         });
     };
 }
-// use feather_m0 as _;
 
 #[interrupt]
 fn USB() {
