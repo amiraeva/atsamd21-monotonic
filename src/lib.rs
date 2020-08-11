@@ -57,7 +57,7 @@ impl FusedTimerCounter<TC4, TC5> {
             w.mode().count32();
             // moral of the story, don't use either, just let it be whatever the default is?
             // w.wavegen().mfrq(); // I spent too many hours to count figuring this out DO NOT USE mfrq
-            w.prescaler().div1(); // divides CPU clock speed
+            w.prescaler().div1024(); // divides CPU clock speed
             w.prescsync().presc();
             w.runstdby().set_bit();
             w.enable().set_bit()
@@ -122,8 +122,8 @@ impl rtic::Monotonic for Tc4Tc5Counter {
 
     fn ratio() -> rtic::Fraction {
         rtic::Fraction {
-            numerator: 1,
-            denominator: 1, // remember that clock divider, huh?
+            numerator: 1024,  // remember that clock divider, huh?
+            denominator: 1,
         }
     }
     fn now() -> Self::Instant {
@@ -170,7 +170,7 @@ impl Add<atsamd_hal::time::Miliseconds> for Instant {
     type Output = Instant;
 
     fn add(self, other: atsamd_hal::time::Miliseconds) -> Self::Output {
-        const MILLIS_TO_CLK: u32 = 48_000_000 / 1000;
+        const MILLIS_TO_CLK: u32 = 48_000_000 / 1024 / 1000;
         let counter_cycles = other.0 * MILLIS_TO_CLK;
         Self(self.0 + counter_cycles as i32)
     }
