@@ -79,13 +79,13 @@ fn main() -> ! {
     );
 
     loop {
-        // let start = atsamd21_monotonic::Monotonic::now();
-        // let next = start + 500.ms();
+        let start = atsamd21_monotonic::Monotonic::now();
+        let next = start + 10_000.ms();
 
-        // while atsamd21_monotonic::Monotonic::now() < next {}
+        while atsamd21_monotonic::Monotonic::now() < next {}
         red_led.toggle();
 
-        cortex_m::asm::wfi();
+        // cortex_m::asm::wfi();
 
         // if tc4tc5_fused.overflowed() {
         //     tc4tc5_fused.reset_ovf_flag();
