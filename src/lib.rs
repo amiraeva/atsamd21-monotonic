@@ -94,7 +94,7 @@ impl FusedTimerCounter<TC4, TC5> {
 
     #[inline]
     fn now(&self) -> Instant {
-        Instant(self.now_u32())
+        Instant(self.now_u32() as _)
     }
 
     #[inline]
@@ -140,7 +140,7 @@ impl rtic::Monotonic for Tc4Tc5Counter {
 }
 
 #[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq, Debug)]
-pub struct Instant(pub u32);
+pub struct Instant(pub i32);
 
 // impl Instant {
 //     pub fn elapsed(&self) -> Instant {
@@ -162,7 +162,7 @@ impl TryInto<u32> for Instant {
     type Error = core::convert::Infallible;
 
     fn try_into(self) -> Result<u32, Self::Error> {
-        Ok(self.0)
+        Ok(self.0 as _)
     }
 }
 
@@ -172,6 +172,6 @@ impl Add<atsamd_hal::time::Miliseconds> for Instant {
     fn add(self, other: atsamd_hal::time::Miliseconds) -> Self::Output {
         const MILLIS_TO_CLK: u32 = 48_000_000 / 1000;
         let counter_cycles = other.0 * MILLIS_TO_CLK;
-        Self(self.0 + counter_cycles)
+        Self(self.0 + counter_cycles as i32)
     }
 }
