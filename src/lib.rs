@@ -1,13 +1,17 @@
 #![no_std]
 
-use core::ops::{self, Add, Sub};
+use core::{
+    convert,
+    ops::{self, Add, Sub},
+};
 
 use atsamd_hal::{
     clock::GenericClockController,
     target_device::{PM, TC4, TC5},
 };
+use convert::TryInto;
 use rtic::Monotonic as _;
-pub struct FusedTimerCounter<T1, T2> {
+struct FusedTimerCounter<T1, T2> {
     t1: T1,
     _t2: T2,
 }
@@ -105,9 +109,15 @@ impl FusedTimerCounter<TC4, TC5> {
 
 static mut MONOTONIC_TIMER: Option<FusedTimerCounter<TC4, TC5>> = None;
 
-pub struct Monotonic;
+pub struct Tc4Tc5Counter;
 
-impl rtic::Monotonic for Monotonic {
+impl Tc4Tc5Counter {
+    pub fn initialize(tc4: TC4, tc5: TC5, gclk: &mut GenericClockController, pm: &mut PM) {
+        FusedTimerCounter::initialize(tc4, tc5, gclk, pm);
+    }
+}
+
+impl rtic::Monotonic for Tc4Tc5Counter {
     type Instant = Instant;
 
     fn ratio() -> rtic::Fraction {
@@ -148,9 +158,11 @@ impl Sub for Instant {
     }
 }
 
-impl From<u32> for Instant {
-    fn from(val: u32) -> Self {
-        Instant(val)
+impl TryInto<u32> for Instant {
+    type Error = core::convert::Infallible;
+
+    fn try_into(self) -> Result<u32, Self::Error> {
+        Ok(self.0)
     }
 }
 
